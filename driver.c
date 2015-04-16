@@ -4,8 +4,8 @@
 
 int main(int argc, char *argv[]){
 	//hardware
-	int* hardware = malloc(sizeof(int) * )
-
+	// int* hardware = malloc(sizeof(int) * )
+	/*
 
 
 	if(argc > 2){
@@ -21,5 +21,7 @@ int main(int argc, char *argv[]){
 		}
 		//do the things
 	}
+	*/
+
 	return 0;
 }
