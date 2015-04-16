@@ -1,5 +1,5 @@
 CC=gcc
-EXEC=yesvm
+EXEC=yes
 OBJS=*.o
 SOURCES=*.c
 
