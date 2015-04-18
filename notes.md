@@ -43,10 +43,8 @@ once that's all set...
     	- %ebp - 5
     	- %esi - 6
     	- %edi - 7
-	- 8 stack pointer
-	- 9 stack frame
-	- 10 PC
-	- 11 flags and status (use lower 3+2 bits)
+	- 8 PC
+	- 9 flags and status (use lower 3+2 bits)
 		- mask 0001 for ZF, 
 		- mask 0010 for SF,
 		- mask 0100 for OF, 
@@ -55,7 +53,7 @@ once that's all set...
 			- 01 for HALT, 
 			- 10 for invalid address, 
 			- 11 for invalid instruction)
-	- 12 for bottom of stack
+	- 10 for bottom of stack
 
 ###other stuff:
 - registers are an array, pass register pointer arround everywhere. 

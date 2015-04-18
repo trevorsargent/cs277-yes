@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include "codes.h"
 
 /*
 	converts an ascii pair to a 1 byte hex value
@@ -11,41 +12,45 @@ unsigned char hexConvert(char, char);
 	read file into the lower order values of the main memory, 
 	returns the first address that's free above the program code.
 */
-int readFile(int, char*[], unsigned char*);
+int readFile(int argc, char** argv, unsigned char* memory);
 // readFile(argc, *argv[], memory)
 
 /*
 	read from memory
-	takes memory address, and returns the value stored in that byte
-	exits program if illegal memory is accessed
+	reads value at memory adddress into the variable passed. 
+	returns 1 if successful and legal, otherwise 0
 */
-unsigned char memRead(int*, int);
+unsigned char memRead(unsigned char* memory, int, unsigned char* ret);
 // memRead(memory, 0x0007FFFF) -> value at 0x000FFFFF
 
 /*
 	write memory
 	writes, to memory address provided, the value provided. 
-	exits program if illgal memory is accessed
+	returns 1 if successful and legal, otherwise 0
 */
-void memWrite(int*, int, int);
+int memWrite(unsigned char* memory, int address, unsigned char value);
 // memWrite(memory, 0x0007FFFF, 0x12345678) -> writes 0x000844DD to 0x0007FFFF
 
 /*
 	read from chip
 	reads, from the chip, the contents of the register designated by the flag passed
+	returns, 0 if failed, 1 if success. 
+
 */
-int chipRead(int*, int);
-// chipRead(chip, 0) -> value at %eax (register 0)
+int chipRead(int* chip, int reg, int* ret);
+// chipRead(chip, EAX, &ret) -> reades, into int ret, value at %eax. 
 
 /*
-	write to chip
+*	write to chip
 	writes, to the chip, the value provided at the register designated by the flag passed
+	returns, 0 if failed, 1 if success. 
+
 */
-void memRead(int*, int, int);
-// memRead(chip, 0, 0x55667788) -> writes 0x55667788 to %eax (register 0)
+int chipWrite(int* chip, int reg, int value);
+// chipWrite(chip, EAX, 0x55667788) -> writes 0x55667788 to %eax 
 
 /*
-	immediate value translator - good for program code
+	immediate value translator - good for program code, executable instruction value bytes.
 	takes the *lowest* address of 4 bytes of hex stored, and returns a *little endian* interpreation of that number. 
 	example: 
 	0x105: FF
@@ -54,22 +59,23 @@ void memRead(int*, int, int);
 	0x108: 99
 	littleEndianInt(int* memory, 0x105); would return 0x99DD33FF
 */
-int littleEndianInt(int* , int);
+int littleEndianInt(unsigned char* memory, int lowest, int* ret);
 
 /*
 	immediate value translator - good for the stack
 	takes the *hightest* address of 4 bytes of hex, and returns a *big endian* interpreation of that number. 
-	example: 
-	0x105: FF
-	0x106: 33
+	example:
+	0x108: 99 
 	0x107: DD
-	0x108: 99
-	bigEndianInt(int* memory, 0x108); would return 0x99DD33FF
+	0x106: 33
+	0x105: FF
+	bigEndianInt(int* memory, 0x108); would return 0xFF33DD99
 */
-int bigEndianInt(int*, int);
+int bigEndianInt(unsigned char* memory, int highest, int* ret);
 
 /*
 	instruction length lookup
 	takes the icode and returns the instruction length in bytes
+	returns 0 if invalid instruction
 */
-int instructionLength(int);
+int instructionLength(int icode);

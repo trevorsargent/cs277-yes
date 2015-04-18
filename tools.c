@@ -1,5 +1,6 @@
 #include "tools.h"
 
+
 //returns the 8 bits of the binary representation of the 2 digit hex value passed: 'A','B' -> 0xAB 
 unsigned char hexConvert(char a, char b){
 	int i =0;
@@ -47,6 +48,89 @@ int readFile(int argc, char * argv[], unsigned char * memory){
 	}while(!feof(fp) && !ferror(fp));
 	
 	return i;
+}
+
+unsigned char memRead(unsigned char* memory, int address, unsigned char* ret){
+	return 0;
+}
+
+int memWrite(unsigned char* memory, int address, unsigned char value){
+	return 0;
+}
+
+int chipRead(int* chip, int reg, int* ret){
+	if((reg >= EAX && reg <= EDI) || reg == SEG){
+		return *(chip+reg);
+	}
+	int stat = (*(chip+CC) >> 3) & 0x3;
+	switch (reg){
+		case ZF:
+			*ret = (*(chip + CC) & 0x1);
+			return 1;
+		case  SF:
+			*ret = (*(chip+CC) >> 1) & 0x01;
+			return 1;
+		case OF:
+			*ret = (*(chip+CC) >>2) & 0x01;
+			return 1;
+		case STAT: 
+			switch (stat){
+				case 0: *ret = AOK;
+					return 1;
+				case 1: *ret = HALT;
+					return 1;
+				case 2: *ret = INVAD;
+					return 1;
+				case 3: *ret = INVIN; 
+					return 1;
+			}	
+			return 0;
+
+	}
+	return 0;
+}
+
+int chipWrite(int* chip, int reg, int value){
+	if((reg >= EAX && reg <= EDI) || reg == SEG){
+		*(chip+reg) = value;
+	}
+	switch (reg){
+		case ZF:
+			*(chip + CC)= value & 0x01;
+			return 1;
+		case  SF:
+			*(chip + CC) = (value & 0x01) << 1;
+			return 1;
+		case OF:
+			*(chip + CC) = (value & 0x01) << 2;
+			return 1;
+		case STAT:
+			*(chip+CC) &= 0x7; //set the bits for this flag to zero no matter what, 
+			switch (value){
+				case AOK: 
+					return 1; //set to 0 (done already)
+				case HALT: *(chip+CC) |= 0x8; //set them to the pre-shiftefd value of 01
+					return 1;
+				case INVAD: *(chip+CC) |= 0x10; //preshifted 10
+					return 1;
+				case INVIN: *(chip+CC) |= 0x18; //preshifted 11
+					return 1;
+			}	
+			return 0;
+	}
+	return 0;
+}
+
+int littleEndianInt(unsigned char* memory, int lowest, int* ret){
+	return 0;
+}
+
+int bigEndianInt(unsigned char* memory, int highest, int* ret){
+	return 0;
+}
+
+int instructionLength(int icode){
+	return 0;
 }
 
 
