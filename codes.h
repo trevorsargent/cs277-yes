@@ -7,8 +7,9 @@
 #define ESI 6
 #define EDI 7
 #define PC 8
-#define CC 9 //do not access this directly, always reference by the registers listed below
-#define SEG 10
+#define SEG 9
+#define CC 10 //do not access this directly, always reference by the registers listed below
+
 
 #define ZF 11
 #define SF 12
@@ -24,3 +25,7 @@
 #define FALSE 0
 #define INVALID 
 
+#define MAXMEM 0x7FFFF
+#define MEM_SZ 0x80000
+
+#define CHIP_SZ 11

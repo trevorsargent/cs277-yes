@@ -79,3 +79,5 @@ int bigEndianInt(unsigned char* memory, int highest, int* ret);
 	returns 0 if invalid instruction
 */
 int instructionLength(int icode);
+
+void printState(unsigned char* memory, int* chip);

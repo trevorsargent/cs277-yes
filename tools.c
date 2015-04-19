@@ -59,8 +59,9 @@ int memWrite(unsigned char* memory, int address, unsigned char value){
 }
 
 int chipRead(int* chip, int reg, int* ret){
-	if((reg >= EAX && reg <= EDI) || reg == SEG){
-		return *(chip+reg);
+
+	if(reg >= EAX && reg <= SEG){
+		*ret = *(chip+reg);
 	}
 	int stat = (*(chip+CC) >> 3) & 0x3;
 	switch (reg){
@@ -91,7 +92,7 @@ int chipRead(int* chip, int reg, int* ret){
 }
 
 int chipWrite(int* chip, int reg, int value){
-	if((reg >= EAX && reg <= EDI) || reg == SEG){
+	if(reg >= EAX && reg <= SEG){
 		*(chip+reg) = value;
 	}
 	switch (reg){
@@ -131,6 +132,10 @@ int bigEndianInt(unsigned char* memory, int highest, int* ret){
 
 int instructionLength(int icode){
 	return 0;
+}
+
+void printState(unsigned char* memory, int* chip){
+	int* state = (int*)malloc(sizeof(int) * CHIP_SZ)
 }
 
 
