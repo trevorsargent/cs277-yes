@@ -1,7 +1,9 @@
+#include <stdio.h>
+#include <stdlib.h>
 #include "tools.h"
 
-
-//returns the 8 bits of the binary representation of the 2 digit hex value passed: 'A','B' -> 0xAB 
+//returns the 8 bits of the binary representation of the 2 digit hex value passed: 
+//'A','B' -> 0xAB 
 unsigned char hexConvert(char a, char b){
 	int i =0;
 	unsigned char ret = 0x00;
@@ -42,7 +44,7 @@ int readFile(int argc, char * argv[], unsigned char * memory){
 	do{
 		char a = fgetc(fp);
 		char b = fgetc(fp);
-		fgetc(fp);
+		//fgetc(fp);
 		*(memory + i) = hexConvert(a, b);
 		i++;
 	}while(!feof(fp) && !ferror(fp));
@@ -50,11 +52,17 @@ int readFile(int argc, char * argv[], unsigned char * memory){
 	return i;
 }
 
-unsigned char memRead(unsigned char* memory, int address, unsigned char* ret){
-	return 0;
+int memRead(unsigned char* memory, int* chip, int address, unsigned char* ret){
+	if(address > MAXMEM){
+		chipWrite(chip, STAT, INVAD);
+		return 0;
+	}else{
+		*ret = *(memory + address);
+		return 1;
+	}
 }
 
-int memWrite(unsigned char* memory, int address, unsigned char value){
+int memWrite(unsigned char* memory, int* chip, int address, unsigned char value){
 	return 0;
 }
 
@@ -135,7 +143,7 @@ int instructionLength(int icode){
 }
 
 void printState(unsigned char* memory, int* chip){
-	int* state = (int*)malloc(sizeof(int) * CHIP_SZ)
+	int* state = (int*)malloc(sizeof(int) * CHIP_SZ);
 }
 
 

@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include "tools.h"
 #include <math.h>
+#include "tools.h"
 #include "codes.h"
 
 int main(int argc, char *argv[]){
@@ -18,7 +18,7 @@ int main(int argc, char *argv[]){
 	//set up the rest of the pointers
 	chipWrite(chip, EBP, MAXMEM);
 	chipWrite(chip, ESP, MAXMEM);
-	chipWrite(chip, PC,  0x0)
+	chipWrite(chip, PC,  0x0);
 	
 	//something else
 
