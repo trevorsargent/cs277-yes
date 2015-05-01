@@ -19,6 +19,16 @@ int main(int argc, char *argv[]){
 	chipWrite(chip, EBP, MAXMEM);
 	chipWrite(chip, ESP, MAXMEM);
 	chipWrite(chip, PC,  0x0);
+	chipWrite(chip, NUMOPS, 0);
+	chipWrite(chip, STAT, AOK);
+
+	chipWrite(chip, EAX, 0);
+	chipWrite(chip, ECX, 0);
+	chipWrite(chip, EDX, 0);
+	chipWrite(chip, EBX, 0);
+	chipWrite(chip, ESI, 0);
+	chipWrite(chip, EDI, 0);
+
 	
 	//something else
 

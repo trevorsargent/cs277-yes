@@ -157,10 +157,10 @@ void printState(int* chip){
 	printf("Steps: %d\n", i);
 
 	chipRead(chip, PC, &i);
-	printf("PC: %d\n", i);
+	printf("PC: 0x%08x\n", i);
 
 	printf("Status: ");
-	chipRead(chip, NUMOPS, &i);
+	chipRead(chip, STAT, &i);
 	switch(i){
 		case AOK : printf("AOK\n"); break;
 		case HALT: printf("HALT\n"); break;
