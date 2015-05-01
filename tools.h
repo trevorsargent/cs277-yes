@@ -20,7 +20,7 @@ int readFile(int argc, char** argv, unsigned char* memory);
 	reads value at memory adddress into the variable passed. 
 	returns 1 if successful and legal, otherwise 0
 */
-int memRead(unsigned char* memory, int* chip int address, unsigned char* ret);
+int memRead(unsigned char* memory, int* chip, int address, unsigned char* ret);
 // memRead(memory, 0x0007FFFF) -> value at 0x000FFFFF
 
 /*
@@ -80,4 +80,4 @@ int bigEndianInt(unsigned char* memory, int highest, int* ret);
 */
 int instructionLength(int icode);
 
-void printState(unsigned char* memory, int* chip);
+void printState(int* chip);

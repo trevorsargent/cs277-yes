@@ -58,12 +58,20 @@ int memRead(unsigned char* memory, int* chip, int address, unsigned char* ret){
 		return 0;
 	}else{
 		*ret = *(memory + address);
+		chipWrite(chip, STAT, AOK);
 		return 1;
 	}
 }
 
 int memWrite(unsigned char* memory, int* chip, int address, unsigned char value){
-	return 0;
+	if(address > MAXMEM){
+		chipWrite(chip, STAT, INVAD);
+		return 0;
+	}else{
+		*(memory + address) = value;
+		chipWrite(chip, STAT, AOK);
+		return 1;
+	}
 }
 
 int chipRead(int* chip, int reg, int* ret){
@@ -73,13 +81,13 @@ int chipRead(int* chip, int reg, int* ret){
 	}
 	int stat = (*(chip+CC) >> 3) & 0x3;
 	switch (reg){
-		case ZF:
+		case CZ:
 			*ret = (*(chip + CC) & 0x1);
 			return 1;
-		case  SF:
+		case  CS:
 			*ret = (*(chip+CC) >> 1) & 0x01;
 			return 1;
-		case OF:
+		case CO:
 			*ret = (*(chip+CC) >>2) & 0x01;
 			return 1;
 		case STAT: 
@@ -104,13 +112,13 @@ int chipWrite(int* chip, int reg, int value){
 		*(chip+reg) = value;
 	}
 	switch (reg){
-		case ZF:
+		case CZ:
 			*(chip + CC)= value & 0x01;
 			return 1;
-		case  SF:
+		case  CS:
 			*(chip + CC) = (value & 0x01) << 1;
 			return 1;
-		case OF:
+		case CO:
 			*(chip + CC) = (value & 0x01) << 2;
 			return 1;
 		case STAT:
@@ -142,8 +150,57 @@ int instructionLength(int icode){
 	return 0;
 }
 
-void printState(unsigned char* memory, int* chip){
-	int* state = (int*)malloc(sizeof(int) * CHIP_SZ);
+void printState(int* chip){
+	
+	int i;
+	chipRead(chip, NUMOPS, &i);
+	printf("Steps: %d\n", i);
+
+	chipRead(chip, PC, &i);
+	printf("PC: %d\n", i);
+
+	printf("Status: ");
+	chipRead(chip, NUMOPS, &i);
+	switch(i){
+		case AOK : printf("AOK\n"); break;
+		case HALT: printf("HALT\n"); break;
+		case INVAD: printf("INVAD\n"); break;
+		case INVIN: printf("INVIN\n"); break;
+	}
+
+	chipRead(chip, CZ, &i);
+	printf("CZ: %d\n", i);
+
+	chipRead(chip, CS, &i);
+	printf("CS: %d\n", i);
+
+	chipRead(chip, CO, &i);
+	printf("CO: %d\n", i);
+
+	chipRead(chip, EAX, &i);
+	printf("EAX: 0x%08x\n", i);
+
+	chipRead(chip, ECX, &i);
+	printf("ECX: 0x%08x\n", i);
+
+	chipRead(chip, EDX, &i);
+	printf("EDX: 0x%08x\n", i);
+
+	chipRead(chip, EBX, &i);
+	printf("EBX: 0x%08x\n", i);
+
+	chipRead(chip, ESP, &i);
+	printf("ESP: 0x%08x\n", i);
+
+	chipRead(chip, EBP, &i);
+	printf("EBP: 0x%08x\n", i);
+
+	chipRead(chip, ESI, &i);
+	printf("ESI: 0x%08x\n", i);
+
+	chipRead(chip, EDI, &i);
+	printf("EDI: 0x%08x\n", i);
+
 }
 
 

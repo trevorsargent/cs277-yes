@@ -9,11 +9,12 @@
 #define PC 8
 #define SEG 9
 #define CC 10 //do not access this directly, always reference by the registers listed below
+#define NUMOPS 11
 
 
-#define ZF 11
-#define SF 12
-#define OF 13
+#define CZ 11
+#define CS 12
+#define CO 13
 #define STAT 14
 
 #define AOK 15
@@ -28,4 +29,4 @@
 #define MAXMEM 0x7FFFF
 #define MEM_SZ 0x80000
 
-#define CHIP_SZ 11
+#define CHIP_SZ 12

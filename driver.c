@@ -22,5 +22,6 @@ int main(int argc, char *argv[]){
 	
 	//something else
 
+	printState(chip);
 	return 0;
 }
