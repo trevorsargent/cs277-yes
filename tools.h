@@ -1,6 +1,5 @@
 // #include <stdio.h>
 // #include <stdlib.h>
-#include "codes.h"
 
 /*
 	converts an ascii pair to a 1 byte hex value

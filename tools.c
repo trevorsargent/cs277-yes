@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "tools.h"
+#include "codes.h"
 
 //returns the 8 bits of the binary representation of the 2 digit hex value passed: 
 //'A','B' -> 0xAB 
