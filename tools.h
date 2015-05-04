@@ -20,13 +20,14 @@ int readFile(int argc, char** argv, unsigned char* memory);
 	reads value at memory adddress into the variable passed. 
 	returns 1 if successful and legal, otherwise 0
 */
-int memRead(unsigned char* memory, int* chip, int address, unsigned char* ret);
+int memRead(unsigned char* memory, int* chip, int address);
 // memRead(memory, 0x0007FFFF) -> value at 0x000FFFFF
 
 /*
 	write memory
 	writes, to memory address provided, the value provided. 
 	returns 1 if successful and legal, otherwise 0
+	set system status
 */
 int memWrite(unsigned char* memory, int* chip, int address, unsigned char value);
 // memWrite(memory, 0x0007FFFF, 0x12345678) -> writes 0x000844DD to 0x0007FFFF
@@ -34,16 +35,18 @@ int memWrite(unsigned char* memory, int* chip, int address, unsigned char value)
 /*
 	read from chip
 	reads, from the chip, the contents of the register designated by the flag passed
-	returns, 0 if failed, 1 if success. 
+	returns value read from chip. 
+	set status
 
 */
-int chipRead(int* chip, int reg, int* ret);
-// chipRead(chip, EAX, &ret) -> reades, into int ret, value at %eax. 
+int chipRead(int* chip, int reg);
+// chipRead(chip, EAX) -> reades, and returns, value at %eax. 
 
 /*
 *	write to chip
 	writes, to the chip, the value provided at the register designated by the flag passed
 	returns, 0 if failed, 1 if success. 
+	set status
 
 */
 int chipWrite(int* chip, int reg, int value);
@@ -58,8 +61,9 @@ int chipWrite(int* chip, int reg, int value);
 	0x107: DD
 	0x108: 99
 	littleEndianInt(int* memory, 0x105); would return 0x99DD33FF
+	set status
 */
-int littleEndianInt(unsigned char* memory, int lowest, int* ret);
+int littleEndianInt(unsigned char* memory, int lowest);
 
 /*
 	immediate value translator - good for the stack
@@ -71,7 +75,7 @@ int littleEndianInt(unsigned char* memory, int lowest, int* ret);
 	0x105: FF
 	bigEndianInt(int* memory, 0x108); would return 0xFF33DD99
 */
-int bigEndianInt(unsigned char* memory, int highest, int* ret);
+int bigEndianInt(unsigned char* memory, int highest);
 
 /*
 	instruction length lookup
@@ -81,3 +85,4 @@ int bigEndianInt(unsigned char* memory, int highest, int* ret);
 int instructionLength(int icode);
 
 void printState(int* chip);
+void chipSetup(int* chip);

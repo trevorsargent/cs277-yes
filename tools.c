@@ -52,14 +52,13 @@ int readFile(int argc, char * argv[], unsigned char * memory){
 	return i;
 }
 
-int memRead(unsigned char* memory, int* chip, int address, unsigned char* ret){
+int memRead(unsigned char* memory, int* chip, int address){
 	if(address > MAXMEM){
 		chipWrite(chip, STAT, INVAD);
 		return 0;
 	}else{
-		*ret = *(memory + address);
 		chipWrite(chip, STAT, AOK);
-		return 1;
+		return *(memory + address);
 	}
 }
 
@@ -74,35 +73,25 @@ int memWrite(unsigned char* memory, int* chip, int address, unsigned char value)
 	}
 }
 
-int chipRead(int* chip, int reg, int* ret){
-
+int chipRead(int* chip, int reg){
 	if(reg >= EAX && reg <= SEG){
-		*ret = *(chip+reg);
+		return *(chip+reg);
 	}
 	int stat = (*(chip+CC) >> 3) & 0x3;
 	switch (reg){
 		case CZ:
-			*ret = (*(chip + CC) & 0x1);
-			return 1;
+			return (*(chip + CC) & 0x1);
 		case  CS:
-			*ret = (*(chip+CC) >> 1) & 0x01;
-			return 1;
+			return (*(chip+CC) >> 1) & 0x01;
 		case CO:
-			*ret = (*(chip+CC) >>2) & 0x01;
-			return 1;
+			return (*(chip+CC) >>2) & 0x01;
 		case STAT: 
 			switch (stat){
-				case 0: *ret = AOK;
-					return 1;
-				case 1: *ret = HALT;
-					return 1;
-				case 2: *ret = INVAD;
-					return 1;
-				case 3: *ret = INVIN; 
-					return 1;
+				case 0: return AOK;
+				case 1: return HALT;
+				case 2: return INVAD;
+				case 3: return INVIN; 
 			}	
-			return 0;
-
 	}
 	return 0;
 }
@@ -138,11 +127,11 @@ int chipWrite(int* chip, int reg, int value){
 	return 0;
 }
 
-int littleEndianInt(unsigned char* memory, int lowest, int* ret){
+int littleEndianInt(unsigned char* memory, int lowest){
 	return 0;
 }
 
-int bigEndianInt(unsigned char* memory, int highest, int* ret){
+int bigEndianInt(unsigned char* memory, int highest){
 	return 0;
 }
 
@@ -152,55 +141,44 @@ int instructionLength(int icode){
 
 void printState(int* chip){
 	
-	int i;
-	chipRead(chip, NUMOPS, &i);
-	printf("Steps: %d\n", i);
-
-	chipRead(chip, PC, &i);
-	printf("PC: 0x%08x\n", i);
-
+	printf("Steps: %d\n", chipRead(chip, NUMOPS));
+	printf("PC: 0x%08x\n", chipRead(chip, PC));
 	printf("Status: ");
-	chipRead(chip, STAT, &i);
-	switch(i){
+	switch(chipRead(chip, STAT)){
 		case AOK : printf("AOK\n"); break;
 		case HALT: printf("HALT\n"); break;
 		case INVAD: printf("INVAD\n"); break;
 		case INVIN: printf("INVIN\n"); break;
 	}
 
-	chipRead(chip, CZ, &i);
-	printf("CZ: %d\n", i);
+	printf("CZ: %d\n", chipRead(chip, CZ));
+	printf("CS: %d\n", chipRead(chip, CS));
+	printf("CO: %d\n", chipRead(chip, CO));
 
-	chipRead(chip, CS, &i);
-	printf("CS: %d\n", i);
+	printf("EAX: 0x%08x\n", chipRead(chip, EAX));
+	printf("ECX: 0x%08x\n", chipRead(chip, EAX));
+	printf("EDX: 0x%08x\n", chipRead(chip, EDX));
+	printf("EBX: 0x%08x\n", chipRead(chip, EBX));
+	printf("ESP: 0x%08x\n", chipRead(chip, ESP));
+	printf("EBP: 0x%08x\n", chipRead(chip, EBP));
+	printf("ESI: 0x%08x\n", chipRead(chip, ESI));
+	printf("EDI: 0x%08x\n", chipRead(chip, EDI));
 
-	chipRead(chip, CO, &i);
-	printf("CO: %d\n", i);
+}
 
-	chipRead(chip, EAX, &i);
-	printf("EAX: 0x%08x\n", i);
+void chipSetup(int* chip){
+	chipWrite(chip, EBP, MAXMEM);
+	chipWrite(chip, ESP, MAXMEM);
+	chipWrite(chip, PC,  0x0);
+	chipWrite(chip, NUMOPS, 0);
+	chipWrite(chip, STAT, AOK);
 
-	chipRead(chip, ECX, &i);
-	printf("ECX: 0x%08x\n", i);
-
-	chipRead(chip, EDX, &i);
-	printf("EDX: 0x%08x\n", i);
-
-	chipRead(chip, EBX, &i);
-	printf("EBX: 0x%08x\n", i);
-
-	chipRead(chip, ESP, &i);
-	printf("ESP: 0x%08x\n", i);
-
-	chipRead(chip, EBP, &i);
-	printf("EBP: 0x%08x\n", i);
-
-	chipRead(chip, ESI, &i);
-	printf("ESI: 0x%08x\n", i);
-
-	chipRead(chip, EDI, &i);
-	printf("EDI: 0x%08x\n", i);
-
+	chipWrite(chip, EAX, 0);
+	chipWrite(chip, ECX, 0);
+	chipWrite(chip, EDX, 0);
+	chipWrite(chip, EBX, 0);
+	chipWrite(chip, ESI, 0);
+	chipWrite(chip, EDI, 0);
 }
 
 

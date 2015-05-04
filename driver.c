@@ -3,6 +3,8 @@
 #include <math.h>
 #include "tools.h"
 #include "codes.h"
+#include "driver.h"
+
 
 int main(int argc, char *argv[]){
 
@@ -16,22 +18,22 @@ int main(int argc, char *argv[]){
 	chipWrite(chip, SEG, readFile(argc, argv, memory));
 
 	//set up the rest of the pointers
-	chipWrite(chip, EBP, MAXMEM);
-	chipWrite(chip, ESP, MAXMEM);
-	chipWrite(chip, PC,  0x0);
-	chipWrite(chip, NUMOPS, 0);
-	chipWrite(chip, STAT, AOK);
-
-	chipWrite(chip, EAX, 0);
-	chipWrite(chip, ECX, 0);
-	chipWrite(chip, EDX, 0);
-	chipWrite(chip, EBX, 0);
-	chipWrite(chip, ESI, 0);
-	chipWrite(chip, EDI, 0);
-
+	chipSetup(chip);
 	
-	//something else
 
+	//Sequential Execution
+	do{
+		//get instruction
+		unsigned char instruction;
+		memRead(memory, chip, chipRead(chip, PC));
+		if(chipRead(chip, STAT)!=AOK){
+			//we should exit the program right?
+		}
+
+	}while(chipRead(chip, STAT) == AOK);
+
+	//print chip state
 	printState(chip);
 	return 0;
 }
+
