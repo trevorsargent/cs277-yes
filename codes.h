@@ -8,8 +8,9 @@
 #define EDI 7
 #define PC 8
 #define SEG 9
-#define CC 10 //do not access this directly, always reference by the registers listed below
-#define NUMOPS 11
+#define NUMOPS 10
+#define CC 11 //do not access this directly, always reference by the registers listed below
+
 
 
 #define CZ 11

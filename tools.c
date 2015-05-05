@@ -8,14 +8,14 @@
 unsigned char hexConvert(char a, char b){
 	int i =0;
 	unsigned char ret = 0x00;
-	if(a >= 'A' && a <= 'F'){
-		ret += a - 'A' + 0xA;
+	if(a >= 'a' && a <= 'f'){
+		ret += a - 'a' + 0xA;
 	}else if(a >= '0' && a <= '9'){
 		ret += a - '0';
 	}
 	ret = ret << 4;
-	if(b >= 'A' && b <= 'F'){
-		ret += b - 'A' + 0xA;
+	if(b >= 'a' && b <= 'f'){
+		ret += b - 'a' + 0xA;
 	}else if(b >= '0' && b <= '9'){
 		ret += b - '0';
 	}
@@ -64,7 +64,7 @@ int memRead(unsigned char* memory, int* chip, int address){
 }
 
 int memWrite(unsigned char* memory, int* chip, int address, unsigned char value){
-	if(address > MAXMEM){
+	if(address > MAXMEM || address < chipRead(chip, SEG)){
 		chipWrite(chip, STAT, INVAD);
 		return 0;
 	}else{
@@ -75,7 +75,7 @@ int memWrite(unsigned char* memory, int* chip, int address, unsigned char value)
 }
 
 int chipRead(int* chip, int reg){
-	if(reg >= EAX && reg <= SEG){
+	if(reg >= EAX && reg <= NUMOPS){
 		return *(chip+reg);
 	}
 	int stat = (*(chip+CC) >> 3) & 0x3;
@@ -98,7 +98,7 @@ int chipRead(int* chip, int reg){
 }
 
 int chipWrite(int* chip, int reg, int value){
-	if(reg >= EAX && reg <= SEG){
+	if(reg >= EAX && reg <= NUMOPS){
 		*(chip+reg) = value;
 	}
 	switch (reg){
@@ -128,16 +128,42 @@ int chipWrite(int* chip, int reg, int value){
 	return 0;
 }
 
-int littleEndianInt(unsigned char* memory, int lowest){
-	return 0;
+int littleEndianInt(unsigned char* memory, int* chip, int lowest){
+	int ret = 0;
+	ret |= (int)memRead(memory, chip, lowest);
+	ret |= (((int)memRead(memory, chip, lowest+1))<<8);
+	ret |= (((int)memRead(memory, chip, lowest+2))<<16);
+	ret |= (((int)memRead(memory, chip, lowest+3))<<24);
+	return ret;
 }
 
-int bigEndianInt(unsigned char* memory, int highest){
-	return 0;
+/*
+int bigEndianInt(unsigned char* memory, int* chip, int highest){
+	int ret = 0;
+	ret |= (int)memRead(memory, chip, highest);
+	ret |= (((int)memRead(memory, chip, highest-1))<<8);
+	ret |= (((int)memRead(memory, chip, highest-2))<<16);
+	ret |= (((int)memRead(memory, chip, highest-3))<<24);
+	return ret;
 }
+*/
 
 int instructionLength(int icode){
-	return 0;
+	switch(icode){
+		case 0x0: return 1;
+		case 0x1: return 1;
+		case 0x2: return 2;
+		case 0x3: return 6;
+		case 0x4: return 6;
+		case 0x5: return 6;
+		case 0x6: return 2;
+		case 0x7: return 5;
+		case 0x8: return 5;
+		case 0x9: return 1;
+		case 0xA: return 2;
+		case 0xB: return 2;
+		default: return 0;	
+	}
 }
 
 void printState(int* chip){
@@ -157,7 +183,7 @@ void printState(int* chip){
 	printf("CO: %d\n", chipRead(chip, CO));
 
 	printf("EAX: 0x%08x\n", chipRead(chip, EAX));
-	printf("ECX: 0x%08x\n", chipRead(chip, EAX));
+	printf("ECX: 0x%08x\n", chipRead(chip, ECX));
 	printf("EDX: 0x%08x\n", chipRead(chip, EDX));
 	printf("EBX: 0x%08x\n", chipRead(chip, EBX));
 	printf("ESP: 0x%08x\n", chipRead(chip, ESP));
@@ -180,6 +206,14 @@ void chipSetup(int* chip){
 	chipWrite(chip, EBX, 0);
 	chipWrite(chip, ESI, 0);
 	chipWrite(chip, EDI, 0);
+
+	chipWrite(chip, CZ, 0);
+	chipWrite(chip, CS, 0);
+	chipWrite(chip, CO, 0);
+}
+
+void pincrement(int* chip, int length){
+	chipWrite(chip, PC, chipRead(chip, PC) + length);
 }
 
 

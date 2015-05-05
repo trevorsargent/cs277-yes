@@ -62,7 +62,7 @@ int chipWrite(int* chip, int reg, int value);
 	littleEndianInt(int* memory, 0x105); would return 0x99DD33FF
 	set status
 */
-int littleEndianInt(unsigned char* memory, int lowest);
+int littleEndianInt(unsigned char* memory, int* chip, int lowest);
 
 /*
 	immediate value translator - good for the stack
@@ -74,7 +74,7 @@ int littleEndianInt(unsigned char* memory, int lowest);
 	0x105: FF
 	bigEndianInt(int* memory, 0x108); would return 0xFF33DD99
 */
-int bigEndianInt(unsigned char* memory, int highest);
+int bigEndianInt(unsigned char* memory, int* chip, int highest);
 
 /*
 	instruction length lookup
@@ -82,6 +82,7 @@ int bigEndianInt(unsigned char* memory, int highest);
 	returns 0 if invalid instruction
 */
 int instructionLength(int icode);
-
 void printState(int* chip);
 void chipSetup(int* chip);
+void pincrement(int * chip, int length);
+

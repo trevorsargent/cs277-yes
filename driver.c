@@ -20,15 +20,21 @@ int main(int argc, char *argv[]){
 	//set up the rest of the pointers
 	chipSetup(chip);
 	
-
 	//Sequential Execution
+	unsigned char instruction;
 	do{
-		//get instruction
-		unsigned char instruction;
-		memRead(memory, chip, chipRead(chip, PC));
+		//fetch
+		instruction = memRead(memory, chip, chipRead(chip, PC));
+
 		if(chipRead(chip, STAT)!=AOK){
-			//we should exit the program right?
+			break;
 		}
+
+		instruct(instruction, memory, chip);
+
+		puts("-----");
+		printState(chip);
+		puts("=====");
 
 	}while(chipRead(chip, STAT) == AOK);
 
@@ -37,3 +43,54 @@ int main(int argc, char *argv[]){
 	return 0;
 }
 
+void instruct(unsigned char instruction, unsigned char *memory, int * chip){
+	unsigned char ifun = instruction&0x0F;
+	unsigned char icode = (instruction>>4)&0x0F;
+	switch(icode){
+		
+		case 0x0:
+			halt(chip, ifun);
+			break;
+		case 0x1:
+			noop(chip, ifun);
+			break;
+		case 0x2:
+			rrmovl(memory, chip, ifun);
+			break;
+		case 0x3:
+			irmovl(memory, chip, ifun);
+			break;
+		case 0x4:
+			rmmovl(memory, chip, ifun);
+			break;
+		case 0x5:
+			mrmovl(memory, chip, ifun);
+			break;
+		case 0x6:
+			op(memory, chip, ifun);
+			break;
+		case 0x7:
+			jmp(memory, chip, ifun);
+			break;
+		case 0x8:
+			call(memory, chip, ifun);
+			break;
+		case 0x9:
+			ret(memory, chip, ifun);
+			break;
+		case 0xA:
+			push(memory, chip, ifun); 
+			break;
+		case 0xB:
+			pop(memory, chip, ifun);
+			break;	
+		default:
+			chipWrite(chip, STAT, INVIN);
+			return;
+				
+	}
+	pincrement(chip, instructionLength(icode));
+	chipWrite(chip, NUMOPS, chipRead(chip, NUMOPS) +1);
+	return;
+
+}
