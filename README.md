@@ -54,7 +54,7 @@ Y86 uses a variable length instruction encoding, they vary from 1-6 bytes
 NOTE: LITTLE ENDIAN BYTE ORDERING
 
 Instruction | Byte 0 | 1 | 2 | 3 | 4 | 5 | notes   
--- | -- | -- | -- | -- | -- | -- | -- | --   
+-- | -- | -- | -- | -- | -- | -- | --  
 `halt`|0x00| | | | | | 
 `nop`|0x10| | | | | | 
 `rrmovl rA,rB`|0x20|rArB| | | | | (%eax to %ecx would be 0x01)   
