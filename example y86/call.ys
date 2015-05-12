@@ -1,0 +1,15 @@
+irmovl $0x00000005, %ecx
+irmovl $0x00000004, %edx
+subl %edx, %ecx
+jl Second
+irmovl 0x12345678, %edi
+halt
+
+Third:
+irmovl $0x09090000, %edi
+halt
+
+Second:
+rrmovl %ecx, %ebx
+rrmovl %edx, %eax
+jmp Third
