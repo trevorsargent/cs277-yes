@@ -53,22 +53,22 @@ Y86 uses a variable length instruction encoding, they vary from 1-6 bytes
 
 NOTE: LITTLE ENDIAN BYTE ORDERING
 
-|Instruction|Byte 0|1|2|3|4|5|notes|   
-|--|--|--|--|--|--|--|--|--|   
-|`halt`|0x00| | | | | | |   
-|`nop`|0x10| | | | | | |
-|`rrmovl rA,rB`|0x20|rArB| | | | | (%eax to %ecx would be 0x01)|   
-|`irmovl v, rB`|ox30|FrB|1F|01|00|00|(register A is immediate (F) and bytes are listed from most to lease significant)   
-|`rmmovl RA, D(vB)`|0x40|rArB|00|00|00|00|offset value D is in the value bytes|
-|`mrmovl D(rA), rB`|0x50|rArB|00|00|00|00|ditto|
-|`jmp`|0x70|00|00|00|00| |location goes in value|
-|`jxx`|0x7x|00|00|00|00| |location goes in value, variation in j[xx] dictates respective variation in 7[x] 
-|`OP rA, rB`|0x6X|rArB| | | | | | 
-|`cmovXX: rA, rB`|0x2X|rArB| | | | | |
-|`call NAME`|0x80| | | | | | |
-|`ret`|0x90| | | | | | |
-|`push rA`|0xA0|rArF| | | | | |
-|`pop rA`|0xB0|rArF| | | | | |
+Instruction | Byte 0 | 1 | 2 | 3 | 4 | 5 | notes   
+-- | -- | -- | -- | -- | -- | -- | -- | --   
+`halt`|0x00| | | | | | 
+`nop`|0x10| | | | | | 
+`rrmovl rA,rB`|0x20|rArB| | | | | (%eax to %ecx would be 0x01)   
+`irmovl v, rB`|ox30|FrB|1F|01|00|00|(register A is immediate (F) and bytes are listed from most to lease significant)
+`rmmovl RA, D(vB)`|0x40|rArB|00|00|00|00|offset value D is in the value bytes
+`mrmovl D(rA), rB`|0x50|rArB|00|00|00|00|ditto
+`jmp`|0x70|00|00|00|00| |location goes in value
+`jxx`|0x7x|00|00|00|00| |location goes in value, variation in j[xx] dictates respective variation in 7[x] 
+`OP rA, rB`|0x6X|rArB| | | | | 
+`cmovXX: rA, rB`|0x2X|rArB| | | | | 
+`call NAME`|0x80| | | | | | 
+`ret`|0x90| | | | | | 
+`push rA`|0xA0|rArF| | | | | 
+`pop rA`|0xB0|rArF| | | | | 
 
 #### ALU Operations
 0x6x
