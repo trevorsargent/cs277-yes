@@ -3,8 +3,6 @@
 #include "tools.h"
 #include "codes.h"
 
-//returns the 8 bits of the binary representation of the 2 digit hex value passed: 
-//'A','B' -> 0xAB 
 unsigned char hexConvert(char a, char b){
 	int i =0;
 	unsigned char ret = 0x00;
@@ -141,17 +139,6 @@ int littleEndianInt(unsigned char* memory, int* chip, int lowest){
 	ret |= (((int)memRead(memory, chip, lowest+3))<<24);
 	return ret;
 }
-
-/*
-int bigEndianInt(unsigned char* memory, int* chip, int highest){
-	int ret = 0;
-	ret |= (int)memRead(memory, chip, highest);
-	ret |= (((int)memRead(memory, chip, highest-1))<<8);
-	ret |= (((int)memRead(memory, chip, highest-2))<<16);
-	ret |= (((int)memRead(memory, chip, highest-3))<<24);
-	return ret;
-}
-*/
 
 int instructionLength(int icode){
 	switch(icode){

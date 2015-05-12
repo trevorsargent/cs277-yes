@@ -1,33 +1,42 @@
-#define EAX 0
+//Genearal Purpose Registers
+
+#define EAX 0 // Return Register
 #define ECX 1
 #define EDX 2
 #define EBX 3
-#define ESP 4
-#define EBP 5
+#define ESP 4 // Stack Pointer
+#define EBP 5 // Stack Frame Pointer
 #define ESI 6
 #define EDI 7
+
+// Special Purpose Registers
+
+// Program Counter 
 #define PC 8
+
+// Top of the program code
 #define SEG 9
+
+// Number of instructions executed
 #define NUMOPS 10
-#define CC 11 //do not access this directly, always reference by the registers listed below
 
-
-
+// Condition Flags
 #define CZ 11
 #define CS 12
 #define CO 13
+
+// System Status, and possible states
 #define STAT 14
+
 
 #define AOK 15
 #define HALT 16
-#define INVAD 17
-#define INVIN 18
+#define INVAD 17 // Invalid Address
+#define INVIN 18 // Invalid Instruction
 
-#define TRUE 1
-#define FALSE 0
-#define INVALID 
+// Constants
 
-#define MAXMEM 0x7FFFF
-#define MEM_SZ 0x80000
+#define MAXMEM 0x7FFFF // Highest availble memory address
+#define MEM_SZ 0x80000 // Memory Size
 
-#define CHIP_SZ 12
+#define CHIP_SZ 12 // Number of 'registers' on the 'chip'

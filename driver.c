@@ -3,9 +3,9 @@
 #include <math.h>
 #include "tools.h"
 #include "codes.h"
-#include "driver.h"
 #include "instruct.h"
 
+void instruct(unsigned char instruction, unsigned char *memory, int * chip);
 
 int main(int argc, char *argv[]){
 
@@ -18,31 +18,36 @@ int main(int argc, char *argv[]){
 	// read in file
 	chipWrite(chip, SEG, readFile(argc, argv, memory));
 
-	//set up the rest of the pointers
+	// set up the rest of the pointers
 	chipSetup(chip);
 	
-	//Sequential Execution
+	// Sequential Execution
 	unsigned char instruction;
 	do{
-		//read the byte at the PC's position
+		// read the byte at the PC's position
 		instruction = memRead(memory, chip, chipRead(chip, PC));
 
-		//throw error if any reading was not completed correctly
+		// throw error if any reading was not completed correctly
 		if(chipRead(chip, STAT)!=AOK){
 			break;
 		}
 
+		// execute the instruction: full instruction cycle
 		instruct(instruction, memory, chip);
 		
 	}while(chipRead(chip, STAT) == AOK);
 
+	// print visible statue of system at halt. 
 	printState(chip);
 	return 0;
 }
 
 void instruct(unsigned char instruction, unsigned char *memory, int * chip){
-	unsigned char ifun = instruction&0x0F;
+	// extract the icode and ifun from the 
 	unsigned char icode = (instruction>>4)&0x0F;
+	unsigned char ifun = instruction&0x0F;
+
+	// branch based on icode
 	switch(icode){
 		
 		case 0x0:
@@ -86,8 +91,12 @@ void instruct(unsigned char instruction, unsigned char *memory, int * chip){
 			return;
 				
 	}
+	// increment the PC based on the instruction
 	pincrement(chip, instructionLength(icode));
+
+	// update the number of instructions executed
 	chipWrite(chip, NUMOPS, chipRead(chip, NUMOPS) +1);
+
 	return;
 
 }

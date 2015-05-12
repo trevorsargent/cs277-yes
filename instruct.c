@@ -3,8 +3,9 @@
 #include "instruct.h"
 #include <stdio.h>
 
+
+// 'halt' 
 void halt(int * chip, int ifun){
-	//puts("halt!");
 	if(ifun != 0){
 		chipWrite(chip, STAT, INVIN);
 		return;
@@ -14,7 +15,6 @@ void halt(int * chip, int ifun){
 }
 
 void noop(int *chip, int ifun){
-	//puts("noop");
 	if(ifun!=0){
 		chipWrite(chip, STAT, INVIN);
 		return;
@@ -23,57 +23,81 @@ void noop(int *chip, int ifun){
 }
 
 void rrmovl(unsigned char * memory, int * chip, int ifun){
-	//puts("(c)rrmovl");
 	unsigned char rA, rB;
+
+	// extract the registers from the second byte of the instruction
 	rA = (memRead(memory, chip, chipRead(chip, PC)+1)>>4) & 0xF;
 	rB = memRead(memory, chip, chipRead(chip, PC )+1) & 0x0F;
+
+	// make sure instruction is valid
 	if(rA >= 8 || rB >= 8){
-		chipWrite(chip, STAT, HALT);
+		chipWrite(chip, STAT, INVIN);
 		return;
 	}
+
+	// declare 'shortcut' variables for the condition codes
 	unsigned char zf = chipRead(chip, CZ);
 	unsigned char sf = chipRead(chip, CS);
 	unsigned char of = chipRead(chip, CO);
+
+
+	// branch based on instruction
+	// set condition
+
+	int move = 0;
 	switch(ifun){
-		case 0x0:
-			chipWrite(chip, rB, chipRead(chip, rA));
+		case 0x0: 
+			move = 1; 
 			break;
 		case 0x1:
 			if((sf ^ of)|zf){
-				chipWrite(chip, rB, chipRead(chip, rA));
-			}
+				move = 1; 
+			} 
 			break;
 		case 0x2:
 			if(sf ^ of){
-				chipWrite(chip, rB, chipRead(chip, rA));
-			}
+				move = 1; 
+			} 
 			break;
 		case 0x3: 
 			if(zf){
-				chipWrite(chip, rB, chipRead(chip, rA));
-			}
+				move = 1; 
+			} 
 			break;
 		case 0x4:
-			if(!zf){chipWrite(chip, rB, chipRead(chip, rA));}
+			if(!zf){
+				move = 1; 
+			} 
 			break;
 		case 0x5:
-			if(!(sf^zf)){chipWrite(chip, rB, chipRead(chip, rA));}
+			if(!(sf^zf)){
+				move = 1; 
+			} 
 			break;
 		case 0x6:
-			if(!(sf^zf)&(~zf)){chipWrite(chip, rB, chipRead(chip, rA));}
+			if(!(sf^zf)&(~zf)){
+				move = 1; 
+			} 
 			break;
 		default:
 			chipWrite(chip, STAT, HALT);
 			break;
+	}
+
+	// if codes were appropriately set for the instruction, 
+	// then execute the move from and to the registers provided
+	if(move){
+		chipWrite(chip, rB, chipRead(chip, rA));
 	}
 	return;
 }
 
 void irmovl(unsigned char * memory, int * chip, int ifun){
 	unsigned char rA, rB;
-	rA = (memRead(memory, chip, chipRead(chip, PC)+1)>>4);
-	rB = memRead(memory, chip, chipRead(chip, PC)+1) & 0x0F;
 
+	// extract the registers from the second byte of the instruction
+	rA = (memRead(memory, chip, chipRead(chip, PC)+1)>>4) & 0x0F;
+	rB = memRead(memory, chip, chipRead(chip, PC)+1) & 0x0F;
 
 	if((ifun != 0) || (rA != 0x0F)){
 		chipWrite(chip, STAT, INVIN);
@@ -83,36 +107,29 @@ void irmovl(unsigned char * memory, int * chip, int ifun){
 	int value = littleEndianInt(memory, chip, chipRead(chip, PC)+2);
 	
 	chipWrite(chip, rB, value);
-
-	//puts("irmovl");
 	return;
 	
 	
 }
 
 void rmmovl(unsigned char * memory, int * chip, int ifun){
-	//puts("rmmovl");
+
 	unsigned char rA, rB;
+
+	// extract the registers from the second byte of the instruction
 	rA = (memRead(memory, chip, chipRead(chip, PC )+1)>>4) & 0x0F;
 	rB = memRead(memory, chip, chipRead(chip, PC )+1) & 0x0F;
 	
+	// reject invalid instructions
 	if((ifun != 0) || (rA != 0x0F)){
 		chipWrite(chip, STAT, INVIN);
 		return;
 	}
 
-	int offset = littleEndianInt(memory, chip, chipRead(chip, PC)+4);
-	int location = rB + offset;
-	unsigned char byte;
+	// read offset from instruction
+	int offset = littleEndianInt(memory, chip, chipRead(chip, PC)+2);
 
-	byte = (unsigned char)(chipRead(chip, rA));
-	memWrite(memory, chip, location, byte);
-	byte = (unsigned char)((chipRead(chip, rA)>>8));
-	memWrite(memory, chip, location+1, byte);
-	byte = (unsigned char)((chipRead(chip, rA)>>16));
-	memWrite(memory, chip, location+2, byte);
-	byte = (unsigned char)((chipRead(chip, rA)>>24));
-	memWrite(memory, chip, location+3, byte);
+	memWrite(memory, chip, rB + offset, chipRead(chip, rA));
 
 	return;
 }
@@ -120,17 +137,19 @@ void rmmovl(unsigned char * memory, int * chip, int ifun){
 	
 
 void mrmovl(unsigned char * memory, int * chip, int ifun){
-	//puts("mrmovl");
 	unsigned char rA, rB;
+
+	// extract the registers from the second byte of the instruction
 	rA = (memRead(memory, chip, chipRead(chip, PC )+1)>>4) & 0x0F;
 	rB = memRead(memory, chip, chipRead(chip, PC )+1) & 0x0F;
 	
+	// reject invalid instructions
 	if((ifun != 0) || (rA != 0x0F)){
 		chipWrite(chip, STAT, INVIN);
 		return;
 	}
 
-	int offset = littleEndianInt(memory, chip, chipRead(chip, PC)+4);
+	int offset = littleEndianInt(memory, chip, chipRead(chip, PC)+2);
 	int value = littleEndianInt(memory, chip, chipRead(chip, rA)+offset);
 	chipWrite(chip, rB, value);
 
@@ -139,20 +158,23 @@ void mrmovl(unsigned char * memory, int * chip, int ifun){
 }
 
 void op(unsigned char * memory, int * chip, int ifun){
-	//puts("op!");
 	unsigned char rA, rB;
+
+	// extract the registers from the second byte of the instruction
 	rA = (memRead(memory, chip, chipRead(chip, PC )+1)>>4) & 0x0F;
 	rB = memRead(memory, chip, chipRead(chip, PC )+1) & 0x0F;
+
+	// declare 'shortcut' variables for following switch
 	int a = chipRead(chip, rA);
 	int b = chipRead(chip, rB);
 	int t;
 	
+	// branch based on instruction
 	switch(ifun){
 		case 0:
 			chipWrite(chip, rB, a + b);
 			t=a+b;
 			break;
-				
 		case 1: 
 			chipWrite(chip, rB, b - a);
 			t=b-a;
@@ -169,6 +191,7 @@ void op(unsigned char * memory, int * chip, int ifun){
 			chipWrite(chip, STAT, INVIN);
 	}
 
+	// set condition codes 
 	chipWrite(chip, CZ, t==0);
 	chipWrite(chip, CS, t<0);
 	chipWrite(chip, CO, (a<0 == b<0) && (t < 0 != a < 0));	
@@ -178,10 +201,13 @@ void op(unsigned char * memory, int * chip, int ifun){
 }
 
 void jmp(unsigned char * memory, int * chip,  int ifun){
-	//puts("jmp!");
+
+	// declare shortcute varables for switch
 	unsigned char zf = chipRead(chip, CZ);
 	unsigned char sf = chipRead(chip, CS);
 	unsigned char of = chipRead(chip, CO);
+
+	// 
 	int dest = littleEndianInt(memory, chip, chipRead(chip, PC)+1);
 	int flag = 0;
 	switch(ifun){
@@ -224,27 +250,13 @@ void jmp(unsigned char * memory, int * chip,  int ifun){
 		
 	}
 	if(flag){
-		chipWrite(chip, PC, dest-5);
+		chipWrite(chip, PC, dest-5); // compensate for the increment that will happen outside the instruction
 	}
 	return;
 
 }
 
 void call(unsigned char * memory, int * chip, int ifun){
-	//puts("call");
-
-	/*
-	decrement esp
-	*(esp) = &nextInstruction (PC + 5)
-	decrement esp
-	*(esp) = ebp
-	ebp = esp
-	
-
-	*/
-
-	
-	
 	//decrement stack pointer (by 4) 'pushing'
 	chipWrite(chip, ESP, chipRead(chip, ESP)-4);
 	
@@ -264,17 +276,6 @@ void call(unsigned char * memory, int * chip, int ifun){
 }
 
 void ret(unsigned char * memory, int * chip, int ifun){
-	//puts("ret");
-
-	/*
-	esp = ebp
-	ebp = *(ebp)
-	esp += 4
-	pc = *(esp)
-	esp += 4
-	
-	*/
-
 	//esp = ebp NOT esp = *(ebp) make esp point to where ebp is pointing
 	chipWrite(chip, ESP, chipRead(chip, EBP));
 	//set ebp back to value stored at memory location stored in ebp - ebp = *(ebp)
@@ -291,10 +292,14 @@ void ret(unsigned char * memory, int * chip, int ifun){
 }
 
 void push(unsigned char * memory, int * chip, int ifun){
-	//puts("push");
+
 	unsigned char rA, rB;
+
+	// extract the registers from the second byte of the instruction
 	rA = (memRead(memory, chip, chipRead(chip, PC)+1)>>4) & 0x0F;
 	rB = memRead(memory, chip, chipRead(chip, PC)+1) & 0x0F;
+
+	// reject invalid instructions
 	if(rB!=0xF || ifun != 0){
 		chipWrite(chip, STAT, INVIN);
 		return;
@@ -302,15 +307,17 @@ void push(unsigned char * memory, int * chip, int ifun){
 
 	chipWrite(chip, ESP, chipRead(chip, ESP) -4);
 	memWrite(memory, chip, chipRead(chip, ESP), chipRead(chip, rA));
-	//printf("*(ESP): 0x%08x\n", littleEndianInt(memory, chip, chipRead(chip, ESP)));
 	return;
 }
 
 void pop(unsigned char * memory, int * chip, int ifun){
-//puts("pop");
 	unsigned char rA, rB;
+
+	// extract the registers from the second byte of the instruction
 	rA = (memRead(memory, chip, chipRead(chip, PC)+1)>>4) & 0x0F;
 	rB = memRead(memory, chip, chipRead(chip, PC)+1) & 0x0F;
+
+	// reject invalid instructions
 	if(rB!=0xF || ifun != 0){
 		chipWrite(chip, STAT, INVIN);
 		return;
