@@ -4,7 +4,7 @@
 #include <stdio.h>
 
 void halt(int * chip, int ifun){
-	puts("halt!");
+	//puts("halt!");
 	if(ifun != 0){
 		chipWrite(chip, STAT, INVIN);
 		return;
@@ -14,7 +14,7 @@ void halt(int * chip, int ifun){
 }
 
 void noop(int *chip, int ifun){
-	puts("noop");
+	//puts("noop");
 	if(ifun!=0){
 		chipWrite(chip, STAT, INVIN);
 		return;
@@ -23,7 +23,7 @@ void noop(int *chip, int ifun){
 }
 
 void rrmovl(unsigned char * memory, int * chip, int ifun){
-	puts("(c)rrmovl");
+	//puts("(c)rrmovl");
 	unsigned char rA, rB;
 	rA = (memRead(memory, chip, chipRead(chip, PC)+1)>>4) & 0xF;
 	rB = memRead(memory, chip, chipRead(chip, PC )+1) & 0x0F;
@@ -84,14 +84,14 @@ void irmovl(unsigned char * memory, int * chip, int ifun){
 	
 	chipWrite(chip, rB, value);
 
-	puts("irmovl");
+	//puts("irmovl");
 	return;
 	
 	
 }
 
 void rmmovl(unsigned char * memory, int * chip, int ifun){
-	puts("rmmovl");
+	//puts("rmmovl");
 	unsigned char rA, rB;
 	rA = (memRead(memory, chip, chipRead(chip, PC )+1)>>4) & 0x0F;
 	rB = memRead(memory, chip, chipRead(chip, PC )+1) & 0x0F;
@@ -120,7 +120,7 @@ void rmmovl(unsigned char * memory, int * chip, int ifun){
 	
 
 void mrmovl(unsigned char * memory, int * chip, int ifun){
-	puts("mrmovl");
+	//puts("mrmovl");
 	unsigned char rA, rB;
 	rA = (memRead(memory, chip, chipRead(chip, PC )+1)>>4) & 0x0F;
 	rB = memRead(memory, chip, chipRead(chip, PC )+1) & 0x0F;
@@ -139,7 +139,7 @@ void mrmovl(unsigned char * memory, int * chip, int ifun){
 }
 
 void op(unsigned char * memory, int * chip, int ifun){
-	puts("op!");
+	//puts("op!");
 	unsigned char rA, rB;
 	rA = (memRead(memory, chip, chipRead(chip, PC )+1)>>4) & 0x0F;
 	rB = memRead(memory, chip, chipRead(chip, PC )+1) & 0x0F;
@@ -155,7 +155,7 @@ void op(unsigned char * memory, int * chip, int ifun){
 				
 		case 1: 
 			chipWrite(chip, rB, b - a);
-			t=a-b;
+			t=b-a;
 			break;
 		case 2:  
 			chipWrite(chip, rB, a & b);
@@ -178,7 +178,7 @@ void op(unsigned char * memory, int * chip, int ifun){
 }
 
 void jmp(unsigned char * memory, int * chip,  int ifun){
-	puts("jmp!");
+	//puts("jmp!");
 	unsigned char zf = chipRead(chip, CZ);
 	unsigned char sf = chipRead(chip, CS);
 	unsigned char of = chipRead(chip, CO);
@@ -231,41 +231,67 @@ void jmp(unsigned char * memory, int * chip,  int ifun){
 }
 
 void call(unsigned char * memory, int * chip, int ifun){
-	puts("call");
+	//puts("call");
 
+	/*
+	decrement esp
+	*(esp) = &nextInstruction (PC + 5)
+	decrement esp
+	*(esp) = ebp
+	ebp = esp
+	
+
+	*/
+
+	
+	
 	//decrement stack pointer (by 4) 'pushing'
 	chipWrite(chip, ESP, chipRead(chip, ESP)-4);
-	//write return address (pc+1) (address of next instruction)
-	memWrite(memory, chip, chipRead(chip, ESP), chipRead(chip, PC)+5);
+	
+	//write return address (pc+5) (address of next instruction)
+	memWrite(memory, chip, chipRead(chip, ESP), chipRead(chip, PC)+5); //*(esp) = &nextInstruction
 	//decrement stack pointer (by 4) 'pushing'
 	chipWrite(chip, ESP, chipRead(chip, ESP)-4);
 	//write value of ebp 
 	memWrite(memory, chip, chipRead(chip, ESP), chipRead(chip, EBP));
-	//set ebp to value of stack pointter
+	//set the value at ebp to value of stack pointer
 	chipWrite(chip, EBP, chipRead(chip, ESP));
-	//set program counter to operand
-	chipWrite(chip, PC, (littleEndianInt(memory, chip, PC)+1)-5);
+	
+	//program counter set to value in the instruction
+	chipWrite(chip, PC, littleEndianInt(memory, chip, chipRead(chip, PC)+1)-5);
+	//printf("im updating pc to 0x%08x in the call function", chipRead(chip, PC));
 	return;
 }
 
 void ret(unsigned char * memory, int * chip, int ifun){
-	puts("ret");
+	//puts("ret");
 
-	//set esp to ebp
+	/*
+	esp = ebp
+	ebp = *(ebp)
+	esp += 4
+	pc = *(esp)
+	esp += 4
+	
+	*/
+
+	//esp = ebp NOT esp = *(ebp) make esp point to where ebp is pointing
 	chipWrite(chip, ESP, chipRead(chip, EBP));
-	//set ebp back to value at ebp
-	chipWrite(chip, EBP, memRead(memory, chip, chipRead(chip, EBP)));
-	//increment esp
-	chipWrite(chip, ESP, chipRead(chip, ESP)+4);
+	//set ebp back to value stored at memory location stored in ebp - ebp = *(ebp)
+	chipWrite(chip, EBP, littleEndianInt(memory, chip, chipRead(chip, EBP)));
+	//increment esp - 
+	chipWrite(chip, ESP, chipRead(chip, ESP)+4); //now it's pointing at the memory address that holds the address of the next instruction
 	//set program counter to value at esp
-	chipWrite(chip, PC, memRead(memory, chip, chipRead(chip, ESP)));
+	chipWrite(chip, PC, littleEndianInt(memory, chip, chipRead(chip, ESP))-1);
+	//printf("im updating pc to 0x%08x in the ret function", chipRead(chip, PC));
 	//increment esp
 	chipWrite(chip, ESP, chipRead(chip, ESP)+4);
+	return;
 
 }
 
 void push(unsigned char * memory, int * chip, int ifun){
-	puts("push");
+	//puts("push");
 	unsigned char rA, rB;
 	rA = (memRead(memory, chip, chipRead(chip, PC)+1)>>4) & 0x0F;
 	rB = memRead(memory, chip, chipRead(chip, PC)+1) & 0x0F;
@@ -275,23 +301,13 @@ void push(unsigned char * memory, int * chip, int ifun){
 	}
 
 	chipWrite(chip, ESP, chipRead(chip, ESP) -4);
-	int location = chipRead(chip, ESP);
-	unsigned char byte;
-
-	byte = (unsigned char)(chipRead(chip, rA));
-	memWrite(memory, chip, location, byte);
-	byte = (unsigned char)((chipRead(chip, rA)>>8));
-	memWrite(memory, chip, location+1, byte);
-	byte = (unsigned char)((chipRead(chip, rA)>>16));
-	memWrite(memory, chip, location+2, byte);
-	byte = (unsigned char)((chipRead(chip, rA)>>24));
-	memWrite(memory, chip, location+3, byte);
-
+	memWrite(memory, chip, chipRead(chip, ESP), chipRead(chip, rA));
+	//printf("*(ESP): 0x%08x\n", littleEndianInt(memory, chip, chipRead(chip, ESP)));
 	return;
 }
 
 void pop(unsigned char * memory, int * chip, int ifun){
-puts("pop");
+//puts("pop");
 	unsigned char rA, rB;
 	rA = (memRead(memory, chip, chipRead(chip, PC)+1)>>4) & 0x0F;
 	rB = memRead(memory, chip, chipRead(chip, PC)+1) & 0x0F;

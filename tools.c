@@ -38,7 +38,7 @@ int readFile(int argc, char * argv[], unsigned char * memory){
 		exit(0);
 	}
 
-	puts("Status: Reading file");
+	//puts("Status: Reading file");
 
 	int i = 0x0;
 
@@ -56,6 +56,7 @@ int readFile(int argc, char * argv[], unsigned char * memory){
 int memRead(unsigned char* memory, int* chip, int address){
 	if(address > MAXMEM){
 		chipWrite(chip, STAT, INVAD);
+		//printf("INVALID READ\n");
 		return 0;
 	}else{
 		chipWrite(chip, STAT, AOK);
@@ -63,12 +64,16 @@ int memRead(unsigned char* memory, int* chip, int address){
 	}
 }
 
-int memWrite(unsigned char* memory, int* chip, int address, unsigned char value){
+int memWrite(unsigned char* memory, int* chip, int address, int value){
 	if(address > MAXMEM || address < chipRead(chip, SEG)){
 		chipWrite(chip, STAT, INVAD);
+		
 		return 0;
 	}else{
-		*(memory + address) = value;
+		int i;
+		for(i=0; i<4; i++){
+			*(memory + address + i) = ((value >> 8*i) & 0xff);
+		}
 		chipWrite(chip, STAT, AOK);
 		return 1;
 	}

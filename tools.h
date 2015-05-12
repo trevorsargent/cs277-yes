@@ -28,7 +28,7 @@ int memRead(unsigned char* memory, int* chip, int address);
 	returns 1 if successful and legal, otherwise 0
 	set system status
 */
-int memWrite(unsigned char* memory, int* chip, int address, unsigned char value);
+int memWrite(unsigned char* memory, int* chip, int address, int value);
 // memWrite(memory, 0x0007FFFF, 0x12345678) -> writes 0x000844DD to 0x0007FFFF
 
 /*

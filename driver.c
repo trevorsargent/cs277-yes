@@ -4,6 +4,7 @@
 #include "tools.h"
 #include "codes.h"
 #include "driver.h"
+#include "instruct.h"
 
 
 int main(int argc, char *argv[]){
@@ -23,22 +24,18 @@ int main(int argc, char *argv[]){
 	//Sequential Execution
 	unsigned char instruction;
 	do{
-		//fetch
+		//read the byte at the PC's position
 		instruction = memRead(memory, chip, chipRead(chip, PC));
 
+		//throw error if any reading was not completed correctly
 		if(chipRead(chip, STAT)!=AOK){
 			break;
 		}
 
 		instruct(instruction, memory, chip);
-
-		puts("-----");
-		printState(chip);
-		puts("=====");
-
+		
 	}while(chipRead(chip, STAT) == AOK);
 
-	//print chip state
 	printState(chip);
 	return 0;
 }
