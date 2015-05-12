@@ -21,18 +21,20 @@
 #define NUMOPS 10
 
 // Condition Flags
-#define CZ 11
-#define CS 12
-#define CO 13
+#define CC 11
+
+#define CZ 12
+#define CS 13
+#define CO 14
 
 // System Status, and possible states
-#define STAT 14
+#define STAT 15
 
 
-#define AOK 15
-#define HALT 16
-#define INVAD 17 // Invalid Address
-#define INVIN 18 // Invalid Instruction
+#define AOK 16
+#define HALT 17
+#define INVAD 18 // Invalid Address
+#define INVIN 19 // Invalid Instruction
 
 // Constants
 
