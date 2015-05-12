@@ -6,10 +6,10 @@ SOURCES=*.c
 all: $(EXEC)
 
 $(EXEC): $(OBJS)
-	$(CC) $(OBJS) -o $(EXEC)
+	$(CC)  $(OBJS) -o $(EXEC)
 
 .c.o:
-	$(CC) -c *.c
+	$(CC) -IHeaders/ -c *.c
 
 clean:
 	rm -f $(OBJS) $(EXEC) a.out
