@@ -9,7 +9,7 @@ $(EXEC): $(OBJS)
 	$(CC)  $(OBJS) -o $(EXEC)
 
 .c.o:
-	$(CC) -IHeaders/ -c *.c
+	$(CC) -Iheaders/ -c *.c
 
 clean:
 	rm -f $(OBJS) $(EXEC) a.out
