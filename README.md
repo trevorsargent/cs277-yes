@@ -3,13 +3,19 @@
 
 A Y86 virtual machine/Sequential Simulator by Dom Mills & Trevor Sargent, under the instruction of Michael Harmon as part of CS277, Architecture and Assembly course at Lewis & Clark College. 
 
+## Running
 
-## To Run:
+### To Run:
 ```
-$ make clean; make
+$ make
 $ ./yes example\ binaries/call.yo
 ```
 or supply a path to any other object file that follows the reduced instruction set described herein. 
+
+### To Clean Up:
+```
+$ make clean
+```
 
 ## Instruction Set / Visible State
 
