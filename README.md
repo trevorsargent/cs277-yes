@@ -87,7 +87,7 @@ Instruction | Byte 0 | 1 | 2 | 3 | 4 | 5 | notes
 Condition flags are set identically to IA-32   
 
 #### Conditional Jumps / Moves
-`j+below` or `cmovl+below`
+`j[below]` or `cmov[below]`
 
 - le: 1 (<=)
 - l: 2 (<)
