@@ -1,11 +1,11 @@
-#Yes
+# Yes
 
-##Decisions
+## Decisions
 Take in ASCII
 
-##Process
+## Process
 
-###preflight: 
+### preflight: 
 - establish memory (array of 2^19 chars)
 - read in the file
 - set the program counter to 0 (or beginning of the file)
@@ -14,15 +14,16 @@ Take in ASCII
 - set up flags
 - make sure we know where the end of the stack
 
-###keep track of:
+### keep track of:
 - status
 - number of status
 
 
 once that's all set...
-##Sequential execution
 
-###functions to have: (DONE)
+## Sequential execution
+
+### functions to have: 
 - int instructionLengthLookup(int icode)
 - int harwareRead(int* hardware, int selector)
 - void hardwareWrite(int* hardware, int selector, int value)
@@ -32,10 +33,10 @@ once that's all set...
 - void memoryWrite(char* address, int value) 
 
 
-###Hardware Array
+### Hardware Array
 - chip
 	- 0-7 registers
-		- %eax - 0
+	- %eax - 0
     	- %ecx - 1
     	- %edx - 2
     	- %ebx - 3
@@ -56,12 +57,12 @@ once that's all set...
 			- 11 for invalid instruction)
 
 
-###other stuff:
+### other stuff:
 - registers are an array, pass register pointer arround everywhere. 
 - hardware array (integers) big array with registers, and flags, program counter, stack pointers, any other 'hardware'
 - instruction array (characters) 
 
-##File Structure 
+## File Structure 
 
 - driver.c
 	- main()
@@ -73,4 +74,3 @@ once that's all set...
 	- memoryWrite()
 	- immediateValueReader()
 - code1.c
-	- 
