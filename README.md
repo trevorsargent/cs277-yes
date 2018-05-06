@@ -1,21 +1,21 @@
-#Yes
-##CS 277 Final Project
+# Yes
+## CS 277 Final Project
 
 A Y86 virtual machine/Sequential Simulator by Dom Mills & Trevor Sargent, under the instruction of Michael Harmon as part of CS277, Architecture and Assembly course at Lewis & Clark College. 
 
 
-##To Run:
+## To Run:
 ```
 $ make clean; make
 $ ./yes example\ binaries/call.yo
 ```
 or supply a path to any other object file that follows the reduced instruction set described herein. 
 
-##Instruction Set / Visible State
+## Instruction Set / Visible State
 
-###Registers
+### Registers
 
-####8 General Purpose Regiesters with Numerical Encodings
+#### 8 General Purpose Regiesters with Numerical Encodings
 - %eax: 0
 - %ecx: 1
 - %edx: 2
@@ -41,10 +41,10 @@ or supply a path to any other object file that follows the reduced instruction s
 	- INVIN (invalid instruction)
 
 
-###Memory
+### Memory
 For this assignment, the addressable space is requred to be from 0 - 2 <sup>32</sup> -1
 
-###Instructions
+### Instructions
 Y86 uses a variable length instruction encoding, they vary from 1-6 bytes 
 
 - byte 0: instruction|function endcoding
